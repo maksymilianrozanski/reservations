@@ -4,6 +4,7 @@ import io.github.maksymilianrozanski.demo.dao.TestTableRepository
 import io.github.maksymilianrozanski.demo.entity.Reservations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.sql.Timestamp
 
 @Service
 class TestTableServiceImpl : TestTableService {
@@ -13,5 +14,9 @@ class TestTableServiceImpl : TestTableService {
 
     override fun findAll(): List<Reservations> {
         return repository.findAll()
+    }
+
+    override fun addReservation(title: String, description: String, start: Timestamp, end: Timestamp) {
+        repository.save(Reservations(title = title, description = description, start = start, end = end))
     }
 }
