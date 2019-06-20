@@ -1,6 +1,6 @@
 package io.github.maksymilianrozanski.demo.rest
 
-import io.github.maksymilianrozanski.demo.entity.TestTableEntity
+import io.github.maksymilianrozanski.demo.entity.Reservations
 import io.github.maksymilianrozanski.demo.service.TestTableService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,7 +13,7 @@ class MyRestController(@Autowired var service: TestTableService) {
 
 
     @GetMapping("/findAll")
-    fun findAll(): List<TestTableEntity> {
+    fun findAll(): List<Reservations> {
         println("find all called")
         return service.findAll()
     }

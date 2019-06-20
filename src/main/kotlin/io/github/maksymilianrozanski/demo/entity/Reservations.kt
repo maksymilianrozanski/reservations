@@ -1,15 +1,19 @@
 package io.github.maksymilianrozanski.demo.entity
 
+import java.sql.Timestamp
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.validation.constraints.NotBlank
 
-@Entity(name = "testtable")
-data class TestTableEntity(
+@Entity(name = "reservations")
+data class Reservations(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Int = 0,
         @get:NotBlank val title: String = "",
-        @get:NotBlank val description: String = ""
+        @get:NotBlank val description: String = "",
+        @get:NotBlank val user: String = "",
+        @get:NotBlank val start: Timestamp = Timestamp(0),
+        @get:NotBlank val end: Timestamp = Timestamp(0)
 )

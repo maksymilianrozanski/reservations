@@ -1,8 +1,8 @@
 package io.github.maksymilianrozanski.demo.service
 
-import io.github.maksymilianrozanski.demo.entity.TestTableEntity
+import io.github.maksymilianrozanski.demo.entity.Reservations
 
 interface TestTableService {
 
-    fun findAll(): List<TestTableEntity>
+    fun findAll(): List<Reservations>
 }
