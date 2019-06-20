@@ -9,5 +9,9 @@ interface TestTableService {
 
     fun addReservation(title: String, description: String, start: Timestamp, end: Timestamp)
 
-    fun deleteReservation(id:Int)
+    fun deleteReservation(id: Int)
+
+    fun deleteReservation(reservation: Reservations)
+
+    fun assignNameToReservation(name: String, reservation: Reservations)
 }

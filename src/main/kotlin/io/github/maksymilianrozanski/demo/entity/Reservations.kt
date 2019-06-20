@@ -13,7 +13,7 @@ data class Reservations(
         val id: Int = 0,
         @get:NotBlank val title: String = "",
         @get:NotBlank val description: String = "",
-        @get:NotBlank val user: String = "",
-        @get:NotBlank val start: Timestamp = Timestamp(0),
-        @get:NotBlank val end: Timestamp = Timestamp(0)
+        @get:NotBlank var user: String = "",
+        val start: Timestamp = Timestamp(0),
+        val end: Timestamp = Timestamp(0)
 )

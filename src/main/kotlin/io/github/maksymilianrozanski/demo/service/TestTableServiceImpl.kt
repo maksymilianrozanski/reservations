@@ -23,4 +23,13 @@ class TestTableServiceImpl : TestTableService {
     override fun deleteReservation(id: Int) {
         repository.deleteById(id)
     }
+
+    override fun deleteReservation(reservation: Reservations) {
+        repository.delete(reservation)
+    }
+
+    override fun assignNameToReservation(name: String, reservation: Reservations) {
+        reservation.user = name
+        repository.save(reservation)
+    }
 }

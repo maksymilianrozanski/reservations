@@ -42,8 +42,27 @@ internal class TestTableServiceImplTest {
     }
 
     @Test
-    fun deleteReservationById(){
+    fun deleteReservationById() {
         service.deleteReservation(15)
         Mockito.verify(repositoryMock).deleteById(15)
+    }
+
+    @Test
+    fun deleteReservationByObject() {
+        val someReservation = Reservations(title = "Title", description = "Description",
+                start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))
+        service.deleteReservation(someReservation)
+        Mockito.verify(repositoryMock).delete(argThat { this == someReservation })
+    }
+
+    @Test
+    fun assignNameToReservation() {
+        val someReservation = Reservations(title = "Title", description = "Description",
+                start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))
+        val nameToSave = "Name to assign"
+        service.assignNameToReservation(nameToSave, someReservation)
+        Mockito.verify(repositoryMock).save(argThat<Reservations> {
+            this.user == nameToSave && this === someReservation
+        })
     }
 }
