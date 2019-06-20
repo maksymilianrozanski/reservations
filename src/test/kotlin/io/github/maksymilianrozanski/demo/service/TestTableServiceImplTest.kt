@@ -40,4 +40,10 @@ internal class TestTableServiceImplTest {
             this.title == title && this.description == description && this.start == start && this.end == end && this.user == ""
         })
     }
+
+    @Test
+    fun deleteReservationById(){
+        service.deleteReservation(15)
+        Mockito.verify(repositoryMock).deleteById(15)
+    }
 }
