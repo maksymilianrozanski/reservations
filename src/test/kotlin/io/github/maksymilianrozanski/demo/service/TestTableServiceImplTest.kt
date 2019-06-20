@@ -60,7 +60,7 @@ internal class TestTableServiceImplTest {
         val someReservation = Reservations(title = "Title", description = "Description",
                 start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))
         val nameToSave = "Name to assign"
-        service.assignNameToReservation(nameToSave, someReservation)
+        service.updateNameOfReservation(nameToSave, someReservation)
         Mockito.verify(repositoryMock).save(argThat<Reservations> {
             this.user == nameToSave && this === someReservation
         })

@@ -28,7 +28,7 @@ class TestTableServiceImpl : TestTableService {
         repository.delete(reservation)
     }
 
-    override fun assignNameToReservation(name: String, reservation: Reservations) {
+    override fun updateNameOfReservation(name: String, reservation: Reservations) {
         reservation.user = name
         repository.save(reservation)
     }

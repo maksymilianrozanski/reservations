@@ -13,5 +13,5 @@ interface TestTableService {
 
     fun deleteReservation(reservation: Reservations)
 
-    fun assignNameToReservation(name: String, reservation: Reservations)
+    fun updateNameOfReservation(name: String, reservation: Reservations)
 }
