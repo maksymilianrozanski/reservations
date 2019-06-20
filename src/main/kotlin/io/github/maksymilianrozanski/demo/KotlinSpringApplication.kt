@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class RealEstateApplication
+class KotlinSpringApplication
 
 fun main(args: Array<String>) {
-    runApplication<RealEstateApplication>(*args)
+    runApplication<KotlinSpringApplication>(*args)
 }
