@@ -32,4 +32,17 @@ class TestTableServiceImpl : TestTableService {
         reservation.user = name
         repository.save(reservation)
     }
+
+    override fun addNameToNotReservedReservation(name: String, reservationId: Int): Boolean {
+        val optionalReservation = repository.findById(reservationId)
+        if (optionalReservation.isPresent) {
+            val reservation = optionalReservation.get()
+            if (reservation.user == "") {
+                reservation.user = name
+                repository.save(reservation)
+                return true
+            }
+        }
+        return false
+    }
 }
