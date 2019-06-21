@@ -55,4 +55,17 @@ class MyRestControllerTest : AbstractTest() {
         Assert.assertEquals(mockedReservation, obtainedList[0])
         Assert.assertEquals(1, obtainedList.size)
     }
+
+    @Test
+    fun findAllTestEmptyList() {
+        Mockito.`when`(testTableServiceMock.findAll()).thenReturn(listOf())
+        val uri = "/api/reservations"
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(200, status)
+        val content = mvcResult.response.contentAsString
+        val obtainedList = super.mapFromJson(content, Array<Reservations>::class.java)
+        Assert.assertEquals(0, obtainedList.size)
+    }
 }
