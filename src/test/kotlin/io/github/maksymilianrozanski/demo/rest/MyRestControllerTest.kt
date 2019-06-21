@@ -68,4 +68,22 @@ class MyRestControllerTest : AbstractTest() {
         val obtainedList = super.mapFromJson(content, Array<Reservations>::class.java)
         Assert.assertEquals(0, obtainedList.size)
     }
+
+    @Test
+    fun addNewReservationTest() {
+        val uri = "/api/reservations"
+        val input = Reservations(title = "title", description = "description",
+                start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+        val output = Reservations(id = 15, title = input.title,
+                description = input.description, start = input.start, end = input.end)
+        Mockito.`when`(testTableServiceMock.addReservation(input.title, input.description, input.start, input.end))
+                .thenReturn(output)
+        val inputJson = super.mapToJson(input)
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(201, status)
+        val content = super.mapFromJson(mvcResult.response.contentAsString, Reservations::class.java)
+        Assert.assertEquals(output, content)
+    }
 }

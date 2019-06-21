@@ -7,7 +7,7 @@ interface TestTableService {
 
     fun findAll(): List<Reservations>
 
-    fun addReservation(title: String, description: String, start: Timestamp, end: Timestamp)
+    fun addReservation(title: String, description: String, start: Timestamp, end: Timestamp): Reservations
 
     fun deleteReservation(id: Int)
 

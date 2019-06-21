@@ -16,8 +16,8 @@ class TestTableServiceImpl : TestTableService {
         return repository.findAll()
     }
 
-    override fun addReservation(title: String, description: String, start: Timestamp, end: Timestamp) {
-        repository.save(Reservations(title = title, description = description, start = start, end = end))
+    override fun addReservation(title: String, description: String, start: Timestamp, end: Timestamp): Reservations {
+        return repository.save(Reservations(title = title, description = description, start = start, end = end))
     }
 
     override fun deleteReservation(id: Int) {

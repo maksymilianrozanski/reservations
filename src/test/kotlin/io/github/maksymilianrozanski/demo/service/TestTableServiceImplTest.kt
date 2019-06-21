@@ -39,9 +39,17 @@ internal class TestTableServiceImplTest {
         val description = "Example description"
         val start = Timestamp(1561037749627L)
         val end = Timestamp(1561037763719L)
-        service.addReservation(title, description, start, end)
+        val toReturnByRepository = Reservations(id = 10, title = title, description = description,
+                start = start, end = end)
+        Mockito.`when`(repositoryMock.save(argThat<Reservations> {
+            this.title == title && this.description == description
+                    && this.start == start && this.end == end
+        })).thenReturn(toReturnByRepository)
+        val returnedFromService = service.addReservation(title, description, start, end)
+        Assert.assertEquals(toReturnByRepository, returnedFromService)
         Mockito.verify(repositoryMock).save(argThat<Reservations> {
-            this.title == title && this.description == description && this.start == start && this.end == end && this.user == ""
+            this.title == title && this.description == description
+                    && this.start == start && this.end == end && this.user == ""
         })
     }
 
