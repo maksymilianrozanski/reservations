@@ -34,6 +34,25 @@ internal class TestTableServiceImplTest {
     }
 
     @Test
+    fun findByIdSuccess() {
+        val title = "Example title"
+        val description = "Example description"
+        val start = Timestamp(1561037749627L)
+        val end = Timestamp(1561037763719L)
+        val toReturnByRepository = Reservations(id = 10, title = title, description = description,
+                start = start, end = end)
+        Mockito.`when`(repositoryMock.findById(10)).thenReturn(Optional.of(toReturnByRepository))
+        val obtainedValue = service.findById(10)
+        Assert.assertEquals(toReturnByRepository, obtainedValue)
+    }
+
+    @Test(expected = NotFoundException::class)
+    fun findByIdNotFound() {
+        Mockito.`when`(repositoryMock.findById(10)).thenReturn(Optional.empty())
+        service.findById(10)
+    }
+
+    @Test
     fun addReservation() {
         val title = "Example title"
         val description = "Example description"
@@ -55,8 +74,16 @@ internal class TestTableServiceImplTest {
 
     @Test
     fun deleteReservationById() {
+        Mockito.`when`(repositoryMock.findById(15)).thenReturn(Optional.of(Reservations(id = 15, title = "Title", description = "description",
+                start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))))
         service.deleteReservation(15)
         Mockito.verify(repositoryMock).deleteById(15)
+    }
+
+    @Test(expected = NotFoundException::class)
+    fun deleteReservationByIdNotFound() {
+        Mockito.`when`(repositoryMock.findById(15)).thenReturn(Optional.empty())
+        service.deleteReservation(15)
     }
 
     @Test

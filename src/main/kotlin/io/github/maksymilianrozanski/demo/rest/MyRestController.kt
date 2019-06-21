@@ -1,9 +1,11 @@
 package io.github.maksymilianrozanski.demo.rest
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.service.NotFoundException
 import io.github.maksymilianrozanski.demo.service.TestTableService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -21,5 +23,15 @@ class MyRestController(@Autowired var service: TestTableService) {
     fun addNewReservation(@RequestBody reservation: Reservations): Reservations {
         return service.addReservation(title = reservation.title, description = reservation.description,
                 start = reservation.start, end = reservation.end)
+    }
+
+    @DeleteMapping("/reservations/{id}")
+    fun deleteReservation(@PathVariable(value = "id") id: Int): ResponseEntity<Void> {
+        return try {
+            service.deleteReservation(id)
+            ResponseEntity(HttpStatus.OK)
+        } catch (e: NotFoundException) {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
     }
 }

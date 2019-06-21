@@ -1,6 +1,7 @@
 package io.github.maksymilianrozanski.demo.rest
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.service.NotFoundException
 import io.github.maksymilianrozanski.demo.service.TestTableService
 import org.junit.Assert
 import org.junit.Before
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -85,5 +87,22 @@ class MyRestControllerTest : AbstractTest() {
         Assert.assertEquals(201, status)
         val content = super.mapFromJson(mvcResult.response.contentAsString, Reservations::class.java)
         Assert.assertEquals(output, content)
+    }
+
+    @Test
+    fun deleteReservationSuccess() {
+        val uri = "/api/reservations/10"
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri).accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(200, status)
+    }
+
+    @Test
+    fun deleteReservationNotFound() {
+        val uri = "/api/reservations/10"
+        Mockito.`when`(testTableServiceMock.deleteReservation(10)).thenAnswer { throw NotFoundException("Not found record with id: 10") }
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri).accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(HttpStatus.NOT_FOUND.value(), status)
     }
 }

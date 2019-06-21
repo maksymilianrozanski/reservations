@@ -16,12 +16,20 @@ class TestTableServiceImpl : TestTableService {
         return repository.findAll()
     }
 
+    override fun findById(id: Int): Reservations {
+        val optional = repository.findById(id)
+        if (optional.isPresent) {
+            return optional.get()
+        } else throw NotFoundException("Not found record with id: $id")
+    }
+
     override fun addReservation(title: String, description: String, start: Timestamp, end: Timestamp): Reservations {
         return repository.save(Reservations(title = title, description = description, start = start, end = end))
     }
 
     override fun deleteReservation(id: Int) {
-        repository.deleteById(id)
+        val reservation = findById(id)
+        repository.deleteById(reservation.id)
     }
 
     override fun deleteReservation(reservation: Reservations) {
@@ -46,3 +54,5 @@ class TestTableServiceImpl : TestTableService {
         return false
     }
 }
+
+class NotFoundException(message: String) : Exception(message)
