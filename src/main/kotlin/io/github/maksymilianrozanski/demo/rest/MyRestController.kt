@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RestController
 class MyRestController(@Autowired var service: TestTableService) {
 
 
-    @GetMapping("/findAll")
+    @GetMapping("/reservations")
     fun findAll(): List<Reservations> {
-        println("find all called")
         return service.findAll()
     }
 }

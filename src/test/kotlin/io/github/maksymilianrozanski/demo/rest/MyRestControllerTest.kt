@@ -23,7 +23,6 @@ class TestTableServiceTestConfiguration {
     @Bean
     @Primary
     fun testTableService(): TestTableService {
-        println("Inside testTableService test bean")
         return Mockito.mock(TestTableService::class.java)
     }
 }
@@ -46,7 +45,7 @@ class MyRestControllerTest : AbstractTest() {
                 end = Timestamp(1561117410153), user = "Some user")
         Mockito.`when`(testTableServiceMock.findAll())
                 .thenReturn(listOf(mockedReservation))
-        val uri = "/api/findAll"
+        val uri = "/api/reservations"
         val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
                 .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
         val status = mvcResult.response.status
