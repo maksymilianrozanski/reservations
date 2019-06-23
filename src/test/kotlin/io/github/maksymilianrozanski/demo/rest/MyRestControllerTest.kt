@@ -1,12 +1,15 @@
 package io.github.maksymilianrozanski.demo.rest
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.service.AlreadyBookedException
 import io.github.maksymilianrozanski.demo.service.NotFoundException
 import io.github.maksymilianrozanski.demo.service.TestTableService
+import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.reset
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -38,6 +41,11 @@ class MyRestControllerTest : AbstractTest() {
     @Before
     override fun setup() {
         super.setup()
+    }
+
+    @After
+    fun after(){
+        reset(testTableServiceMock)
     }
 
     @Test
@@ -104,5 +112,49 @@ class MyRestControllerTest : AbstractTest() {
         val mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri).accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
         val status = mvcResult.response.status
         Assert.assertEquals(HttpStatus.NOT_FOUND.value(), status)
+    }
+
+    @Test
+    fun bookingReservationSuccess() {
+        val uri = "/api/book"
+        val reservation = Reservations(id = 15, user = "Example user", title = "title", description = "description",
+                start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+        val inputJson = super.mapToJson(reservation)
+        Mockito.`when`(testTableServiceMock.addNameToNotReservedReservation("Example user", 15))
+                .thenReturn(reservation)
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(200, status)
+        val content = super.mapFromJson(mvcResult.response.contentAsString, Reservations::class.java)
+        Assert.assertEquals(reservation, content)
+    }
+
+    @Test
+    fun bookingReservationNotFoundException(){
+        val uri = "/api/book"
+        val reservation = Reservations(id = 15, user = "Example user", title = "title", description = "description",
+                start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+        val inputJson = super.mapToJson(reservation)
+        Mockito.`when`(testTableServiceMock.addNameToNotReservedReservation("Example user", 15))
+                .thenAnswer { throw NotFoundException("Not found record with id: 15")}
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(HttpStatus.NOT_FOUND.value(), status)
+    }
+
+    @Test
+    fun bookingReservationAlreadyBooked(){
+        val uri = "/api/book"
+        val reservation = Reservations(id = 15, user = "Example user", title = "title", description = "description",
+                start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+        val inputJson = super.mapToJson(reservation)
+        Mockito.`when`(testTableServiceMock.addNameToNotReservedReservation("Example user", 15))
+                .thenAnswer { throw AlreadyBookedException("Reservation with id: 15 is already booked")}
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(HttpStatus.CONFLICT.value(), status)
     }
 }

@@ -1,6 +1,7 @@
 package io.github.maksymilianrozanski.demo.rest
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.service.AlreadyBookedException
 import io.github.maksymilianrozanski.demo.service.NotFoundException
 import io.github.maksymilianrozanski.demo.service.TestTableService
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,6 +33,17 @@ class MyRestController(@Autowired var service: TestTableService) {
             ResponseEntity(HttpStatus.OK)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+    }
+
+    @PostMapping("/book")
+    fun bookReservation(@RequestBody reservation: Reservations): ResponseEntity<Reservations> {
+        return try {
+            ResponseEntity.ok(service.addNameToNotReservedReservation(reservation.user, reservation.id))
+        } catch (notFound: NotFoundException) {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        } catch (alreadyBooked: AlreadyBookedException) {
+            ResponseEntity(HttpStatus.CONFLICT)
         }
     }
 }

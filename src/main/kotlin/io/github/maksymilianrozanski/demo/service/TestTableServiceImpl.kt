@@ -41,18 +41,21 @@ class TestTableServiceImpl : TestTableService {
         repository.save(reservation)
     }
 
-    override fun addNameToNotReservedReservation(name: String, reservationId: Int): Boolean {
+    override fun addNameToNotReservedReservation(name: String, reservationId: Int): Reservations {
         val optionalReservation = repository.findById(reservationId)
         if (optionalReservation.isPresent) {
             val reservation = optionalReservation.get()
             if (reservation.user == "") {
                 reservation.user = name
                 repository.save(reservation)
-                return true
+                return reservation
             }
+            else throw AlreadyBookedException("Reservation with id: $reservationId is already booked")
         }
-        return false
+        throw NotFoundException("Not found record with id: $reservationId")
     }
 }
 
 class NotFoundException(message: String) : Exception(message)
+
+class AlreadyBookedException(message: String) : Exception(message)

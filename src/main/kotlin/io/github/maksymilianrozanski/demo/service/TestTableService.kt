@@ -17,5 +17,5 @@ interface TestTableService {
 
     fun updateNameOfReservation(name: String, reservation: Reservations)
 
-    fun addNameToNotReservedReservation(name: String, reservationId: Int): Boolean
+    fun addNameToNotReservedReservation(name: String, reservationId: Int): Reservations
 }

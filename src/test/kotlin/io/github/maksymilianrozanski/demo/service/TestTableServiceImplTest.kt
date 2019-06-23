@@ -13,6 +13,7 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import java.sql.Timestamp
 import java.util.*
+import kotlin.test.assertFailsWith
 
 internal class TestTableServiceImplTest {
 
@@ -112,11 +113,10 @@ internal class TestTableServiceImplTest {
         val nameToInsert = "Name to insert"
         Mockito.`when`(repositoryMock.findById(someReservation.id)).thenReturn(Optional.of(someReservation))
 
-        val isUpdatedSuccessfully = service.addNameToNotReservedReservation(nameToInsert, someReservation.id)
+        service.addNameToNotReservedReservation(nameToInsert, someReservation.id)
         Mockito.verify(repositoryMock).save(argThat<Reservations> {
             this.user == nameToInsert && this === someReservation
         })
-        Assert.assertTrue(isUpdatedSuccessfully)
     }
 
     @Test
@@ -125,16 +125,14 @@ internal class TestTableServiceImplTest {
                 start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))
         someReservation.user = "Already taken"
         Mockito.`when`(repositoryMock.findById(someReservation.id)).thenReturn(Optional.of(someReservation))
-        val isUpdatedSuccessfully = service.addNameToNotReservedReservation("Name", someReservation.id)
+        assertFailsWith<AlreadyBookedException> { service.addNameToNotReservedReservation("Name", someReservation.id) }
         Mockito.verify(repositoryMock, never()).save(any<Reservations>())
-        Assert.assertFalse(isUpdatedSuccessfully)
     }
 
     @Test
     fun tryAddNameToNotExistingReservation() {
         Mockito.`when`(repositoryMock.findById(15)).thenReturn(Optional.empty())
-        val isUpdatedSuccessfully = service.addNameToNotReservedReservation("Name", 15)
+        assertFailsWith<NotFoundException> { service.addNameToNotReservedReservation("Name", 15) }
         Mockito.verify(repositoryMock, never()).save(any<Reservations>())
-        Assert.assertFalse(isUpdatedSuccessfully)
     }
 }
