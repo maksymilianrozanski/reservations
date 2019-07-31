@@ -36,12 +36,16 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     var myFailureHandler = SimpleUrlAuthenticationFailureHandler()
 
     override fun configure(http: HttpSecurity?) {
-        http
-                ?.csrf()?.disable()?.exceptionHandling()?.authenticationEntryPoint(restAuthenticationEntryPoint)
-                ?.and()?.authorizeRequests()?.antMatchers("/api/*")
-                ?.authenticated()
-                ?.and()
-                ?.formLogin()?.successHandler(mySuccessHandler)?.failureHandler(myFailureHandler)?.and()?.cors()?.and()?.logout()
+        http!!.
+                csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint)
+                .and()
+                .authorizeRequests().anyRequest().authenticated()
+//                .antMatchers("/api/**")
+//                .hasRole("ADMIN")
+                .and()
+                .formLogin()
+                .successHandler(mySuccessHandler).failureHandler(myFailureHandler).and().cors().and().logout()
     }
 
     override fun configure(auth: AuthenticationManagerBuilder?) {
@@ -59,7 +63,9 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
         configuration.allowedOrigins = listOf("*")
-        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE")
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+        configuration.allowCredentials = true
+        configuration.allowedHeaders = listOf("Authorization", "Cache-Control", "Content-Type")
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
         return source
