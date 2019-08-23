@@ -44,7 +44,7 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @After
-    fun after(){
+    fun after() {
         reset(testTableServiceMock)
     }
 
@@ -131,13 +131,13 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
-    fun bookingReservationNotFoundException(){
+    fun bookingReservationNotFoundException() {
         val uri = "/api/book"
         val reservation = Reservations(id = 15, user = "Example user", title = "title", description = "description",
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
         val inputJson = super.mapToJson(reservation)
         Mockito.`when`(testTableServiceMock.addNameToNotReservedReservation("Example user", 15))
-                .thenAnswer { throw NotFoundException("Not found record with id: 15")}
+                .thenAnswer { throw NotFoundException("Not found record with id: 15") }
         val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(inputJson)).andReturn()
         val status = mvcResult.response.status
@@ -145,13 +145,13 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
-    fun bookingReservationAlreadyBooked(){
+    fun bookingReservationAlreadyBooked() {
         val uri = "/api/book"
         val reservation = Reservations(id = 15, user = "Example user", title = "title", description = "description",
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
         val inputJson = super.mapToJson(reservation)
         Mockito.`when`(testTableServiceMock.addNameToNotReservedReservation("Example user", 15))
-                .thenAnswer { throw AlreadyBookedException("Reservation with id: 15 is already booked")}
+                .thenAnswer { throw AlreadyBookedException("Reservation with id: 15 is already booked") }
         val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(inputJson)).andReturn()
         val status = mvcResult.response.status
