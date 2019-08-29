@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 open class CustomUserDetailsService(private val userRepository: UserRepository) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
-        return CustomUserDetails(userRepository.findOneByUserName(username)!!)
+        return CustomUserDetails(userRepository.findOneByUsername(username)!!)
         //TODO: can throw null pointer exception
     }
 }

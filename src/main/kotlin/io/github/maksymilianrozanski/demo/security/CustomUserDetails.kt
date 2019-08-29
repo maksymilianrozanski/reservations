@@ -21,26 +21,26 @@ open class CustomUserDetails(val user: User) : UserDetails {
     }
 
     override fun isEnabled(): Boolean {
-        return user.enabled
+        return true
     }
 
     override fun getUsername(): String {
-        return user.userName
+        return user.username
     }
 
     override fun isCredentialsNonExpired(): Boolean {
-        return user.credentialsNonExpired
+        return true
     }
 
     override fun getPassword(): String {
-        return user.passWord
+        return user.password
     }
 
     override fun isAccountNonExpired(): Boolean {
-        return user.accountNonExpired
+        return true
     }
 
     override fun isAccountNonLocked(): Boolean {
-        return user.accountNonLocked
+        return true
     }
 }
