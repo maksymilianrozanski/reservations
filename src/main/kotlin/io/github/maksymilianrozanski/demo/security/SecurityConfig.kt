@@ -9,8 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.channel.ChannelProcessingFilter
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler
@@ -26,7 +24,13 @@ import javax.servlet.http.HttpServletResponse
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig : WebSecurityConfigurerAdapter() {
+class SecurityConfig() : WebSecurityConfigurerAdapter() {
+
+    @Autowired
+    lateinit var customUserDetailsService: CustomUserDetailsService
+
+    @Autowired
+    lateinit var passwordEncoderAndMatcher: PasswordEncoderAndMatcherConfig
 
     @Autowired
     lateinit var restAuthenticationEntryPoint: RestAuthenticationEntryPoint
@@ -50,14 +54,8 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     }
 
     override fun configure(auth: AuthenticationManagerBuilder?) {
-        auth?.inMemoryAuthentication()?.withUser("admin")?.password(encoder().encode("pass"))?.roles("ADMIN")
-                ?.and()
-                ?.withUser("user")?.password(encoder().encode("pass"))?.roles("USER")
-    }
-
-    @Bean
-    fun encoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
+        auth?.userDetailsService(customUserDetailsService)
+                ?.passwordEncoder(passwordEncoderAndMatcher.passwordEncoderAndMatcher())
     }
 
     @Bean
