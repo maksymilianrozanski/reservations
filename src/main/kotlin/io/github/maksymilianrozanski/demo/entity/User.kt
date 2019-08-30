@@ -13,6 +13,10 @@ data class User(var firstName: String = "",
     @GeneratedValue
     var id: Long = 0
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL))
-    var roles: Set<Role> = HashSet()
+    //TODO: set proper cascade type
+    @ManyToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL))
+    @JoinTable(name = "user_roles",
+            inverseJoinColumns = [JoinColumn(name = "roles_id")],
+            joinColumns = [JoinColumn(name = "user_id")])
+    var roles: List<Role> = listOf()
 }

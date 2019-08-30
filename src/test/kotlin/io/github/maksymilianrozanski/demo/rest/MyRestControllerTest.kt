@@ -1,6 +1,7 @@
 package io.github.maksymilianrozanski.demo.rest
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.security.contextholder.RolesProvider
 import io.github.maksymilianrozanski.demo.service.AlreadyBookedException
 import io.github.maksymilianrozanski.demo.service.NotFoundException
 import io.github.maksymilianrozanski.demo.service.TestTableService
@@ -30,6 +31,12 @@ class TestTableServiceTestConfiguration {
     fun testTableService(): TestTableService {
         return Mockito.mock(TestTableService::class.java)
     }
+
+    @Bean
+    @Primary
+    fun testRolesProvider(): RolesProvider {
+        return Mockito.mock(RolesProvider::class.java)
+    }
 }
 
 @ActiveProfiles("test")
@@ -38,6 +45,9 @@ class MyRestControllerTest : AbstractTest() {
     @Autowired
     private lateinit var testTableServiceMock: TestTableService
 
+    @Autowired
+    private lateinit var testRolesProviderMock: RolesProvider
+
     @Before
     override fun setup() {
         super.setup()
@@ -45,7 +55,19 @@ class MyRestControllerTest : AbstractTest() {
 
     @After
     fun after() {
-        reset(testTableServiceMock)
+        reset(testTableServiceMock, testRolesProviderMock)
+    }
+
+    @Test
+    fun getUserRolesTest() {
+        Mockito.`when`(testRolesProviderMock.getRoles()).thenReturn(listOf("ADMIN", "USER", "GUEST"))
+        val uri = "/api/roles"
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(200, status)
+        val content = mvcResult.response.contentAsString
+        val obtainedRolesArray = super.mapFromJson(content, Array<String>::class.java)
+        Assert.assertEquals(listOf("ADMIN", "USER", "GUEST"), obtainedRolesArray.toList())
     }
 
     @Test

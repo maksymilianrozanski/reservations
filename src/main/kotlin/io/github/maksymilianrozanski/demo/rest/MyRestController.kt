@@ -1,6 +1,7 @@
 package io.github.maksymilianrozanski.demo.rest
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.security.contextholder.RolesProvider
 import io.github.maksymilianrozanski.demo.service.AlreadyBookedException
 import io.github.maksymilianrozanski.demo.service.NotFoundException
 import io.github.maksymilianrozanski.demo.service.TestTableService
@@ -13,6 +14,14 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api")
 class MyRestController(@Autowired var service: TestTableService) {
+
+    @Autowired
+    lateinit var roles: RolesProvider
+
+    @GetMapping("/roles")
+    fun getUserRoles(): List<String> {
+        return roles.getRoles()
+    }
 
     @GetMapping("/reservations")
     fun findAll(): List<Reservations> {
