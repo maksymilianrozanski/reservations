@@ -4,7 +4,7 @@ import io.github.maksymilianrozanski.demo.entity.Reservations
 import io.github.maksymilianrozanski.demo.security.contextholder.RolesProvider
 import io.github.maksymilianrozanski.demo.service.AlreadyBookedException
 import io.github.maksymilianrozanski.demo.service.NotFoundException
-import io.github.maksymilianrozanski.demo.service.TestTableService
+import io.github.maksymilianrozanski.demo.service.ReservationsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 @CrossOrigin(origins = ["http://localhost:4200"])
 @RestController
 @RequestMapping("/api")
-class MyRestController(@Autowired var service: TestTableService) {
+class MyRestController(@Autowired var service: ReservationsService) {
 
     @Autowired
     lateinit var roles: RolesProvider

@@ -3,7 +3,7 @@ package io.github.maksymilianrozanski.demo.service
 import io.github.maksymilianrozanski.demo.entity.Reservations
 import java.sql.Timestamp
 
-interface TestTableService {
+interface ReservationsService {
 
     fun findAll(): List<Reservations>
 

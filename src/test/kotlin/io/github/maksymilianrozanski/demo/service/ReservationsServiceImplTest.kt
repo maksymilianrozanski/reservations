@@ -15,16 +15,16 @@ import java.sql.Timestamp
 import java.util.*
 import kotlin.test.assertFailsWith
 
-internal class TestTableServiceImplTest {
+internal class ReservationsServiceImplTest {
 
-    lateinit var service: TestTableServiceImpl
+    lateinit var service: ReservationsServiceImpl
     @Mock
     lateinit var repositoryMock: ReservationsRepository
 
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        service = TestTableServiceImpl()
+        service = ReservationsServiceImpl()
         service.repository = repositoryMock
     }
 

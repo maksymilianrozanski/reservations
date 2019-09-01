@@ -4,7 +4,7 @@ import io.github.maksymilianrozanski.demo.entity.Reservations
 import io.github.maksymilianrozanski.demo.security.contextholder.RolesProvider
 import io.github.maksymilianrozanski.demo.service.AlreadyBookedException
 import io.github.maksymilianrozanski.demo.service.NotFoundException
-import io.github.maksymilianrozanski.demo.service.TestTableService
+import io.github.maksymilianrozanski.demo.service.ReservationsService
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -28,8 +28,8 @@ class TestTableServiceTestConfiguration {
 
     @Bean
     @Primary
-    fun testTableService(): TestTableService {
-        return Mockito.mock(TestTableService::class.java)
+    fun reservationsService(): ReservationsService {
+        return Mockito.mock(ReservationsService::class.java)
     }
 
     @Bean
@@ -43,7 +43,7 @@ class TestTableServiceTestConfiguration {
 class MyRestControllerTest : AbstractTest() {
 
     @Autowired
-    private lateinit var testTableServiceMock: TestTableService
+    private lateinit var reservationsServiceMock: ReservationsService
 
     @Autowired
     private lateinit var testRolesProviderMock: RolesProvider
@@ -55,7 +55,7 @@ class MyRestControllerTest : AbstractTest() {
 
     @After
     fun after() {
-        reset(testTableServiceMock, testRolesProviderMock)
+        reset(reservationsServiceMock, testRolesProviderMock)
     }
 
     @Test
@@ -75,7 +75,7 @@ class MyRestControllerTest : AbstractTest() {
         val mockedReservation = Reservations(id = 20, title = "This is title returned by mock service",
                 description = "description", start = Timestamp(1561117396873),
                 end = Timestamp(1561117410153), user = "Some user")
-        Mockito.`when`(testTableServiceMock.findAll())
+        Mockito.`when`(reservationsServiceMock.findAll())
                 .thenReturn(listOf(mockedReservation))
         val uri = "/api/reservations"
         val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -90,7 +90,7 @@ class MyRestControllerTest : AbstractTest() {
 
     @Test
     fun findAllTestEmptyList() {
-        Mockito.`when`(testTableServiceMock.findAll()).thenReturn(listOf())
+        Mockito.`when`(reservationsServiceMock.findAll()).thenReturn(listOf())
         val uri = "/api/reservations"
         val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
                 .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
@@ -108,7 +108,7 @@ class MyRestControllerTest : AbstractTest() {
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
         val output = Reservations(id = 15, title = input.title,
                 description = input.description, start = input.start, end = input.end)
-        Mockito.`when`(testTableServiceMock.addReservation(input.title, input.description, input.start, input.end))
+        Mockito.`when`(reservationsServiceMock.addReservation(input.title, input.description, input.start, input.end))
                 .thenReturn(output)
         val inputJson = super.mapToJson(input)
         val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
@@ -130,7 +130,7 @@ class MyRestControllerTest : AbstractTest() {
     @Test
     fun deleteReservationNotFound() {
         val uri = "/api/reservations/10"
-        Mockito.`when`(testTableServiceMock.deleteReservation(10)).thenAnswer { throw NotFoundException("Not found record with id: 10") }
+        Mockito.`when`(reservationsServiceMock.deleteReservation(10)).thenAnswer { throw NotFoundException("Not found record with id: 10") }
         val mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri).accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
         val status = mvcResult.response.status
         Assert.assertEquals(HttpStatus.NOT_FOUND.value(), status)
@@ -142,7 +142,7 @@ class MyRestControllerTest : AbstractTest() {
         val reservation = Reservations(id = 15, user = "Example user", title = "title", description = "description",
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
         val inputJson = super.mapToJson(reservation)
-        Mockito.`when`(testTableServiceMock.addNameToNotReservedReservation("Example user", 15))
+        Mockito.`when`(reservationsServiceMock.addNameToNotReservedReservation("Example user", 15))
                 .thenReturn(reservation)
         val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(inputJson)).andReturn()
@@ -158,7 +158,7 @@ class MyRestControllerTest : AbstractTest() {
         val reservation = Reservations(id = 15, user = "Example user", title = "title", description = "description",
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
         val inputJson = super.mapToJson(reservation)
-        Mockito.`when`(testTableServiceMock.addNameToNotReservedReservation("Example user", 15))
+        Mockito.`when`(reservationsServiceMock.addNameToNotReservedReservation("Example user", 15))
                 .thenAnswer { throw NotFoundException("Not found record with id: 15") }
         val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(inputJson)).andReturn()
@@ -172,7 +172,7 @@ class MyRestControllerTest : AbstractTest() {
         val reservation = Reservations(id = 15, user = "Example user", title = "title", description = "description",
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
         val inputJson = super.mapToJson(reservation)
-        Mockito.`when`(testTableServiceMock.addNameToNotReservedReservation("Example user", 15))
+        Mockito.`when`(reservationsServiceMock.addNameToNotReservedReservation("Example user", 15))
                 .thenAnswer { throw AlreadyBookedException("Reservation with id: 15 is already booked") }
         val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(inputJson)).andReturn()

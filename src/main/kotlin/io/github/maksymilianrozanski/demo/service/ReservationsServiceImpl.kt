@@ -8,7 +8,7 @@ import java.sql.Timestamp
 import java.util.stream.Collectors
 
 @Service
-class TestTableServiceImpl : TestTableService {
+class ReservationsServiceImpl : ReservationsService {
 
     @Autowired
     lateinit var repository: ReservationsRepository
