@@ -1,6 +1,7 @@
 package io.github.maksymilianrozanski.demo.security
 
 import io.github.maksymilianrozanski.demo.dao.UserRepository
+import io.github.maksymilianrozanski.demo.entity.User
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -12,12 +13,21 @@ import java.util.stream.Collectors
 class CustomUserDetailsService(private val userRepository: UserRepository) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
-        val user = userRepository.findOneByUsername(username)
-                ?: throw UsernameNotFoundException("User with name: $username not found.")
+        val user = findUser(username)
         return CustomUserDetails(user)
     }
 
-    fun currentUserRoles(): List<String>{
+    fun currentUser(): User {
+        val currentUsername = SecurityContextHolder.getContext().authentication.name
+        return findUser(currentUsername)
+    }
+
+    private fun findUser(username: String): User {
+        return userRepository.findOneByUsername(username)
+                ?: throw UsernameNotFoundException("User with name: $username not found.")
+    }
+
+    fun currentUserRoles(): List<String> {
         return SecurityContextHolder.getContext().authentication.authorities.stream().map {
             it.authority
         }.collect(Collectors.toList())
