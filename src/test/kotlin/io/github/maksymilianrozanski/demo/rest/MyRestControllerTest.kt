@@ -1,7 +1,7 @@
 package io.github.maksymilianrozanski.demo.rest
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
-import io.github.maksymilianrozanski.demo.security.contextholder.RolesProvider
+import io.github.maksymilianrozanski.demo.security.CustomUserDetailsService
 import io.github.maksymilianrozanski.demo.service.NotFoundException
 import io.github.maksymilianrozanski.demo.service.ReservationsService
 import org.junit.After
@@ -33,8 +33,8 @@ class TestTableServiceTestConfiguration {
 
     @Bean
     @Primary
-    fun testRolesProvider(): RolesProvider {
-        return Mockito.mock(RolesProvider::class.java)
+    fun userDetailsService(): CustomUserDetailsService {
+        return Mockito.mock(CustomUserDetailsService::class.java)
     }
 }
 
@@ -45,7 +45,7 @@ class MyRestControllerTest : AbstractTest() {
     private lateinit var reservationsServiceMock: ReservationsService
 
     @Autowired
-    private lateinit var testRolesProviderMock: RolesProvider
+    private lateinit var userDetailsServiceMock: CustomUserDetailsService
 
     @Before
     override fun setup() {
@@ -54,12 +54,12 @@ class MyRestControllerTest : AbstractTest() {
 
     @After
     fun after() {
-        reset(reservationsServiceMock, testRolesProviderMock)
+        reset(reservationsServiceMock, userDetailsServiceMock)
     }
 
     @Test
     fun getUserRolesTest() {
-        Mockito.`when`(testRolesProviderMock.getRoles()).thenReturn(listOf("ADMIN", "USER", "GUEST"))
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("ADMIN", "USER", "GUEST"))
         val uri = "/api/roles"
         val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
         val status = mvcResult.response.status
