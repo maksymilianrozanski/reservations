@@ -48,6 +48,7 @@ class ReservationsServiceImpl : ReservationsService {
         repository.save(reservation)
     }
 
+    //TODO: remove user's password from response
     override fun addUserToNotReservedReservation(user:User, reservationId: Int): Reservations {
         val optionalReservation = repository.findById(reservationId)
         if (optionalReservation.isPresent) {

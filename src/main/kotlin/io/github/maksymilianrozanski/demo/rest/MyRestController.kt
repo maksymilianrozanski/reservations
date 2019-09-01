@@ -2,6 +2,7 @@ package io.github.maksymilianrozanski.demo.rest
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
 import io.github.maksymilianrozanski.demo.security.CustomUserDetailsService
+import io.github.maksymilianrozanski.demo.service.AlreadyBookedException
 import io.github.maksymilianrozanski.demo.service.NotFoundException
 import io.github.maksymilianrozanski.demo.service.ReservationsService
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,15 +44,16 @@ class MyRestController(@Autowired var service: ReservationsService) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
-    //TODO: implement method
-//    @PostMapping("/book")
-//    fun bookReservation(@RequestBody reservation: Reservations): ResponseEntity<Reservations> {
-//        return try {
-//            ResponseEntity.ok(service.addNameToNotReservedReservation(reservation.user, reservation.id))
-//        } catch (notFound: NotFoundException) {
-//            ResponseEntity(HttpStatus.NOT_FOUND)
-//        } catch (alreadyBooked: AlreadyBookedException) {
-//            ResponseEntity(HttpStatus.CONFLICT)
-//        }
-//    }
+
+    @PostMapping("/book")
+    fun bookReservation(@RequestBody reservation: Reservations): ResponseEntity<Reservations> {
+        return try {
+            val currentUser = userDetailsService.currentUser()
+            ResponseEntity.ok(service.addUserToNotReservedReservation(currentUser, reservation.reservationId))
+        } catch (notFound: NotFoundException) {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        } catch (alreadyBooked: AlreadyBookedException) {
+            ResponseEntity(HttpStatus.CONFLICT)
+        }
+    }
 }
