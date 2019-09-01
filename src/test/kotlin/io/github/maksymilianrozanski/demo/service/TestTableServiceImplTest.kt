@@ -3,7 +3,7 @@ package io.github.maksymilianrozanski.demo.service
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.never
-import io.github.maksymilianrozanski.demo.dao.TestTableRepository
+import io.github.maksymilianrozanski.demo.dao.ReservationsRepository
 import io.github.maksymilianrozanski.demo.entity.Reservations
 import org.junit.Assert
 import org.junit.Before
@@ -19,7 +19,7 @@ internal class TestTableServiceImplTest {
 
     lateinit var service: TestTableServiceImpl
     @Mock
-    lateinit var repositoryMock: TestTableRepository
+    lateinit var repositoryMock: ReservationsRepository
 
     @Before
     fun before() {

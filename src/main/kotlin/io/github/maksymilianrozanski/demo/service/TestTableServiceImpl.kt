@@ -1,6 +1,6 @@
 package io.github.maksymilianrozanski.demo.service
 
-import io.github.maksymilianrozanski.demo.dao.TestTableRepository
+import io.github.maksymilianrozanski.demo.dao.ReservationsRepository
 import io.github.maksymilianrozanski.demo.entity.Reservations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -11,7 +11,7 @@ import java.util.stream.Collectors
 class TestTableServiceImpl : TestTableService {
 
     @Autowired
-    lateinit var repository: TestTableRepository
+    lateinit var repository: ReservationsRepository
 
     override fun findAll(): List<Reservations> {
         return repository.findAll()
