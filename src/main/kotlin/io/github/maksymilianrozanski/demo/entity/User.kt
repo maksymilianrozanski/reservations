@@ -11,7 +11,7 @@ data class User(var firstName: String = "",
 
     @Id
     @GeneratedValue
-    var id: Long = 0
+    var userId: Long = 0
 
     //TODO: set proper cascade type
     @ManyToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL))
@@ -19,4 +19,7 @@ data class User(var firstName: String = "",
             inverseJoinColumns = [JoinColumn(name = "roles_id")],
             joinColumns = [JoinColumn(name = "user_id")])
     var roles: List<Role> = listOf()
+
+    @OneToMany(mappedBy = "user")
+    var reservations: List<Reservations> = listOf()
 }

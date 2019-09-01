@@ -1,6 +1,7 @@
 package io.github.maksymilianrozanski.demo.service
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.entity.User
 import java.sql.Timestamp
 
 interface ReservationsService {
@@ -17,7 +18,7 @@ interface ReservationsService {
 
     fun deleteReservation(reservation: Reservations)
 
-    fun updateNameOfReservation(name: String, reservation: Reservations)
+    fun changeUserOfReservation(newUser: User, reservation: Reservations)
 
-    fun addNameToNotReservedReservation(name: String, reservationId: Int): Reservations
+    fun addUserToNotReservedReservation(user: User, reservationId: Int): Reservations
 }

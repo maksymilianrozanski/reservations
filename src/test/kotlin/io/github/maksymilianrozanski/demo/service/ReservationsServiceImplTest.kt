@@ -5,6 +5,7 @@ import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.never
 import io.github.maksymilianrozanski.demo.dao.ReservationsRepository
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.entity.User
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -40,10 +41,12 @@ internal class ReservationsServiceImplTest {
         val reservationMock2 = Mockito.mock(Reservations::class.java)
         val reservationMock3 = Mockito.mock(Reservations::class.java)
         val reservationMock4 = Mockito.mock(Reservations::class.java)
-        Mockito.`when`(reservationMock1.user).thenReturn("")
-        Mockito.`when`(reservationMock2.user).thenReturn("John")
-        Mockito.`when`(reservationMock3.user).thenReturn("Marry")
-        Mockito.`when`(reservationMock4.user).thenReturn("")
+        val userMock1 = Mockito.mock(User::class.java)
+        val userMock2 = Mockito.mock(User::class.java)
+        Mockito.`when`(reservationMock1.user).thenReturn(null)
+        Mockito.`when`(reservationMock2.user).thenReturn(userMock1)
+        Mockito.`when`(reservationMock3.user).thenReturn(userMock2)
+        Mockito.`when`(reservationMock4.user).thenReturn(null)
         val reservations = listOf(reservationMock1, reservationMock2, reservationMock3, reservationMock4)
         Mockito.`when`(repositoryMock.findAll()).thenReturn(reservations)
 
@@ -57,7 +60,7 @@ internal class ReservationsServiceImplTest {
         val description = "Example description"
         val start = Timestamp(1561037749627L)
         val end = Timestamp(1561037763719L)
-        val toReturnByRepository = Reservations(id = 10, title = title, description = description,
+        val toReturnByRepository = Reservations(reservationId = 10, title = title, description = description,
                 start = start, end = end)
         Mockito.`when`(repositoryMock.findById(10)).thenReturn(Optional.of(toReturnByRepository))
         val obtainedValue = service.findById(10)
@@ -76,7 +79,7 @@ internal class ReservationsServiceImplTest {
         val description = "Example description"
         val start = Timestamp(1561037749627L)
         val end = Timestamp(1561037763719L)
-        val toReturnByRepository = Reservations(id = 10, title = title, description = description,
+        val toReturnByRepository = Reservations(reservationId = 10, title = title, description = description,
                 start = start, end = end)
         Mockito.`when`(repositoryMock.save(argThat<Reservations> {
             this.title == title && this.description == description
@@ -86,13 +89,13 @@ internal class ReservationsServiceImplTest {
         Assert.assertEquals(toReturnByRepository, returnedFromService)
         Mockito.verify(repositoryMock).save(argThat<Reservations> {
             this.title == title && this.description == description
-                    && this.start == start && this.end == end && this.user == ""
+                    && this.start == start && this.end == end && this.user == null
         })
     }
 
     @Test
     fun deleteReservationById() {
-        Mockito.`when`(repositoryMock.findById(15)).thenReturn(Optional.of(Reservations(id = 15, title = "Title", description = "description",
+        Mockito.`when`(repositoryMock.findById(15)).thenReturn(Optional.of(Reservations(reservationId = 15, title = "Title", description = "description",
                 start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))))
         service.deleteReservation(15)
         Mockito.verify(repositoryMock).deleteById(15)
@@ -113,26 +116,26 @@ internal class ReservationsServiceImplTest {
     }
 
     @Test
-    fun assignNameToReservation() {
+    fun assignUserToReservation() {
         val someReservation = Reservations(title = "Title", description = "Description",
                 start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))
-        val nameToSave = "Name to assign"
-        service.updateNameOfReservation(nameToSave, someReservation)
+        val userToSaveMock = Mockito.mock(User::class.java)
+        service.changeUserOfReservation(userToSaveMock, someReservation)
         Mockito.verify(repositoryMock).save(argThat<Reservations> {
-            this.user == nameToSave && this === someReservation
+            this.user == userToSaveMock && this === someReservation
         })
     }
 
     @Test
-    fun addNameToNotReservedReservationSuccess() {
+    fun addUserToNotReservedReservationSuccess() {
         val someReservation = Reservations(title = "Title", description = "Description",
                 start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))
-        val nameToInsert = "Name to insert"
-        Mockito.`when`(repositoryMock.findById(someReservation.id)).thenReturn(Optional.of(someReservation))
+        val userToInsertMock = Mockito.mock(User::class.java)
+        Mockito.`when`(repositoryMock.findById(someReservation.reservationId)).thenReturn(Optional.of(someReservation))
 
-        service.addNameToNotReservedReservation(nameToInsert, someReservation.id)
+        service.addUserToNotReservedReservation(userToInsertMock, someReservation.reservationId)
         Mockito.verify(repositoryMock).save(argThat<Reservations> {
-            this.user == nameToInsert && this === someReservation
+            this.user == userToInsertMock && this === someReservation
         })
     }
 
@@ -140,16 +143,16 @@ internal class ReservationsServiceImplTest {
     fun tryToAddNameToAlreadyReserved() {
         val someReservation = Reservations(title = "Title", description = "Description",
                 start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))
-        someReservation.user = "Already taken"
-        Mockito.`when`(repositoryMock.findById(someReservation.id)).thenReturn(Optional.of(someReservation))
-        assertFailsWith<AlreadyBookedException> { service.addNameToNotReservedReservation("Name", someReservation.id) }
+        someReservation.user = Mockito.mock(User::class.java)
+        Mockito.`when`(repositoryMock.findById(someReservation.reservationId)).thenReturn(Optional.of(someReservation))
+        assertFailsWith<AlreadyBookedException> { service.addUserToNotReservedReservation(Mockito.mock(User::class.java), someReservation.reservationId) }
         Mockito.verify(repositoryMock, never()).save(any<Reservations>())
     }
 
     @Test
     fun tryAddNameToNotExistingReservation() {
         Mockito.`when`(repositoryMock.findById(15)).thenReturn(Optional.empty())
-        assertFailsWith<NotFoundException> { service.addNameToNotReservedReservation("Name", 15) }
+        assertFailsWith<NotFoundException> { service.addUserToNotReservedReservation(Mockito.mock(User::class.java), 15) }
         Mockito.verify(repositoryMock, never()).save(any<Reservations>())
     }
 }

@@ -2,6 +2,7 @@ package io.github.maksymilianrozanski.demo.service
 
 import io.github.maksymilianrozanski.demo.dao.ReservationsRepository
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.entity.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
@@ -19,7 +20,7 @@ class ReservationsServiceImpl : ReservationsService {
 
     override fun findUnoccupiedReservations(): List<Reservations> {
         return repository.findAll().stream()
-                .filter { reservation -> reservation.user == "" }.collect(Collectors.toList())
+                .filter { reservation -> reservation.user == null }.collect(Collectors.toList())
     }
 
     override fun findById(id: Int): Reservations {
@@ -35,24 +36,24 @@ class ReservationsServiceImpl : ReservationsService {
 
     override fun deleteReservation(id: Int) {
         val reservation = findById(id)
-        repository.deleteById(reservation.id)
+        repository.deleteById(reservation.reservationId)
     }
 
     override fun deleteReservation(reservation: Reservations) {
         repository.delete(reservation)
     }
 
-    override fun updateNameOfReservation(name: String, reservation: Reservations) {
-        reservation.user = name
+    override fun changeUserOfReservation(newUser: User, reservation: Reservations) {
+        reservation.user = newUser
         repository.save(reservation)
     }
 
-    override fun addNameToNotReservedReservation(name: String, reservationId: Int): Reservations {
+    override fun addUserToNotReservedReservation(user:User, reservationId: Int): Reservations {
         val optionalReservation = repository.findById(reservationId)
         if (optionalReservation.isPresent) {
             val reservation = optionalReservation.get()
-            if (reservation.user == "") {
-                reservation.user = name
+            if (reservation.user == null) {
+                reservation.user = user
                 repository.save(reservation)
                 return reservation
             } else throw AlreadyBookedException("Reservation with id: $reservationId is already booked")
