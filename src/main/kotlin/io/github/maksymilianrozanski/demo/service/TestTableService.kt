@@ -7,6 +7,8 @@ interface TestTableService {
 
     fun findAll(): List<Reservations>
 
+    fun findUnoccupiedReservations(): List<Reservations>
+
     fun findById(id: Int): Reservations
 
     fun addReservation(title: String, description: String, start: Timestamp, end: Timestamp): Reservations

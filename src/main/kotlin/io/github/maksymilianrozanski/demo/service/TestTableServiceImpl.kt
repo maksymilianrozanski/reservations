@@ -5,6 +5,7 @@ import io.github.maksymilianrozanski.demo.entity.Reservations
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
+import java.util.stream.Collectors
 
 @Service
 class TestTableServiceImpl : TestTableService {
@@ -14,6 +15,11 @@ class TestTableServiceImpl : TestTableService {
 
     override fun findAll(): List<Reservations> {
         return repository.findAll()
+    }
+
+    override fun findUnoccupiedReservations(): List<Reservations> {
+        return repository.findAll().stream()
+                .filter { reservation -> reservation.user == "" }.collect(Collectors.toList())
     }
 
     override fun findById(id: Int): Reservations {
@@ -49,8 +55,7 @@ class TestTableServiceImpl : TestTableService {
                 reservation.user = name
                 repository.save(reservation)
                 return reservation
-            }
-            else throw AlreadyBookedException("Reservation with id: $reservationId is already booked")
+            } else throw AlreadyBookedException("Reservation with id: $reservationId is already booked")
         }
         throw NotFoundException("Not found record with id: $reservationId")
     }

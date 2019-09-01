@@ -35,6 +35,23 @@ internal class TestTableServiceImplTest {
     }
 
     @Test
+    fun findUnoccupiedReservations() {
+        val reservationMock1 = Mockito.mock(Reservations::class.java)
+        val reservationMock2 = Mockito.mock(Reservations::class.java)
+        val reservationMock3 = Mockito.mock(Reservations::class.java)
+        val reservationMock4 = Mockito.mock(Reservations::class.java)
+        Mockito.`when`(reservationMock1.user).thenReturn("")
+        Mockito.`when`(reservationMock2.user).thenReturn("John")
+        Mockito.`when`(reservationMock3.user).thenReturn("Marry")
+        Mockito.`when`(reservationMock4.user).thenReturn("")
+        val reservations = listOf(reservationMock1, reservationMock2, reservationMock3, reservationMock4)
+        Mockito.`when`(repositoryMock.findAll()).thenReturn(reservations)
+
+        val unoccupiedReservations = service.findUnoccupiedReservations()
+        Assert.assertEquals(listOf(reservationMock1, reservationMock4), unoccupiedReservations)
+    }
+
+    @Test
     fun findByIdSuccess() {
         val title = "Example title"
         val description = "Example description"
