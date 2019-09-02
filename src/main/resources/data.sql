@@ -1,6 +1,8 @@
+SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE user;
 TRUNCATE TABLE role;
 TRUNCATE TABLE user_roles;
+SET FOREIGN_KEY_CHECKS = 1;
 
 INSERT INTO user (user_id, email, first_name, last_name, password, username)
 VALUES (1, 'example@example.com', 'firstname', 'lastname',

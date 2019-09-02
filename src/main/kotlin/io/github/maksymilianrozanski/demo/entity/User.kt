@@ -13,8 +13,7 @@ data class User(var firstName: String = "",
     @GeneratedValue
     var userId: Long = 0
 
-    //TODO: set proper cascade type
-    @ManyToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL))
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             inverseJoinColumns = [JoinColumn(name = "roles_id")],
             joinColumns = [JoinColumn(name = "user_id")])
