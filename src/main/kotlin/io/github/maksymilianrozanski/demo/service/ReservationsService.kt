@@ -10,7 +10,7 @@ interface ReservationsService {
 
     fun findUnoccupiedReservations(): List<Reservations>
 
-    fun findById(id: Int): Reservations
+    fun findById(id: Int): Reservations?
 
     fun addReservation(title: String, description: String, start: Timestamp, end: Timestamp): Reservations
 
@@ -18,7 +18,7 @@ interface ReservationsService {
 
     fun deleteReservation(reservation: Reservations)
 
-    fun changeUserOfReservation(newUser: User, reservation: Reservations): Reservations
+    fun editReservation(reservation: Reservations): Reservations
 
     fun addUserToNotReservedReservation(user: User, reservationId: Int): Reservations
 }

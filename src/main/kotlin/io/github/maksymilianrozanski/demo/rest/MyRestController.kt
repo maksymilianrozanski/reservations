@@ -45,15 +45,27 @@ class MyRestController(@Autowired var service: ReservationsService) {
         }
     }
 
-    @PostMapping("/book")
-    fun bookReservation(@RequestBody reservation: Reservations): ResponseEntity<Reservations> {
-        return try {
-            val currentUser = userDetailsService.currentUser()
-            ResponseEntity.ok(service.addUserToNotReservedReservation(currentUser, reservation.reservationId))
+    @PutMapping("/reservations")
+    fun editReservation(@RequestBody reservation: Reservations): ResponseEntity<Reservations> {
+        try {
+            if (userDetailsService.currentUserRoles().contains("Role(roleName=ADMIN)")) {
+                return ResponseEntity.ok(service.editReservation(reservation))
+            }
+            //Not admin
+            else if (userDetailsService.currentUserRoles().contains("Role(roleName=USER)")) {
+                if (userDetailsService.currentUser().username == service.findById(reservation.reservationId)?.user?.username ?: false) {
+                    //Already booked by this user
+                    return ResponseEntity(HttpStatus.NO_CONTENT)
+                }
+                return ResponseEntity.ok(service.addUserToNotReservedReservation(userDetailsService.currentUser(), reservation.reservationId))
+            } else {
+                //User without any role
+                return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            }
         } catch (notFound: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+            return ResponseEntity(HttpStatus.NOT_FOUND)
         } catch (alreadyBooked: AlreadyBookedException) {
-            ResponseEntity(HttpStatus.CONFLICT)
+            return ResponseEntity(HttpStatus.CONFLICT)
         }
     }
 }

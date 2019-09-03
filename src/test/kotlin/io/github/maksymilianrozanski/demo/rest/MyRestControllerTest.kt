@@ -141,17 +141,20 @@ class MyRestControllerTest : AbstractTest() {
     fun bookingReservationSuccess() {
         val userMock = Mockito.mock(User::class.java)
         Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
-        val uri = "/api/book"
+        Mockito.`when`(userMock.username).thenReturn("SomeUserName")
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
         val reservation = Reservations(reservationId = 15, user = null, title = "title", description = "description",
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+        Mockito.`when`(reservationsServiceMock.findById(15)).thenReturn(reservation)
+        val uri = "/api/reservations"
         val serviceResponse = Reservations(reservationId = 15, user = User(firstName = "First name", lastName = "Last name",
-                email = "example@example.com",  username = "SomeUserName"),
+                email = "example@example.com", username = "SomeUserName"),
                 title = "title", description = "description",
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
         val inputJson = super.mapToJson(reservation)
         Mockito.`when`(reservationsServiceMock.addUserToNotReservedReservation(userMock, 15))
                 .thenReturn(serviceResponse)
-        val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.put(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(inputJson)).andReturn()
         val status = mvcResult.response.status
         Assert.assertEquals(200, status)
@@ -163,13 +166,16 @@ class MyRestControllerTest : AbstractTest() {
     fun bookingReservationNotFoundException() {
         val userMock = Mockito.mock(User::class.java)
         Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
-        val uri = "/api/book"
-        val reservation = Reservations(reservationId = 15, user = null, title = "title", description = "description",
+        Mockito.`when`(userMock.username).thenReturn("SomeUserName")
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
+        val uri = "/api/reservations"
+        val reservation = Reservations(reservationId = 15, user = User(firstName = "First name", lastName = "Last name",
+                email = "example@example.com", username = "SomeUserName"), title = "title", description = "description",
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
         val inputJson = super.mapToJson(reservation)
         Mockito.`when`(reservationsServiceMock.addUserToNotReservedReservation(userMock, 15))
                 .thenAnswer { throw NotFoundException("Not found record with id: 15") }
-        val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.put(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(inputJson)).andReturn()
         val status = mvcResult.response.status
         Assert.assertEquals(HttpStatus.NOT_FOUND.value(), status)
@@ -179,15 +185,40 @@ class MyRestControllerTest : AbstractTest() {
     fun bookingReservationAlreadyBooked() {
         val userMock = Mockito.mock(User::class.java)
         Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
-        val uri = "/api/book"
-        val reservation = Reservations(reservationId = 15, user = null, title = "title", description = "description",
+        Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
+        Mockito.`when`(userMock.username).thenReturn("SomeUserName")
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
+        val uri = "/api/reservations"
+        val reservation = Reservations(reservationId = 15, user = User(firstName = "First name", lastName = "Last name",
+                email = "example@example.com", username = "SomeUserName"), title = "title", description = "description",
                 start = Timestamp(1561122072971), end = Timestamp(1561122085630))
         val inputJson = super.mapToJson(reservation)
         Mockito.`when`(reservationsServiceMock.addUserToNotReservedReservation(userMock, 15))
                 .thenAnswer { throw AlreadyBookedException("Reservation with id: 15 is already booked") }
-        val mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.put(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(inputJson)).andReturn()
         val status = mvcResult.response.status
         Assert.assertEquals(HttpStatus.CONFLICT.value(), status)
+    }
+
+    @Test
+    fun bookingReservationByTheSameUserAgain() {
+        val userMock = Mockito.mock(User::class.java)
+        Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
+        Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
+        Mockito.`when`(userMock.username).thenReturn("SomeUserName")
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
+        val reservationMock = Mockito.mock(Reservations::class.java)
+        Mockito.`when`(reservationsServiceMock.findById(15)).thenReturn(reservationMock)
+        Mockito.`when`(reservationMock.user).thenReturn(userMock)
+        val uri = "/api/reservations"
+        val reservation = Reservations(reservationId = 15, user = User(firstName = "First name", lastName = "Last name",
+                email = "example@example.com", username = "SomeUserName"), title = "title", description = "description",
+                start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+        val inputJson = super.mapToJson(reservation)
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.put(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(HttpStatus.NO_CONTENT.value(), status)
     }
 }

@@ -43,8 +43,7 @@ class ReservationsServiceImpl : ReservationsService {
         repository.delete(reservation)
     }
 
-    override fun changeUserOfReservation(newUser: User, reservation: Reservations): Reservations {
-        reservation.user = newUser
+    override fun editReservation( reservation: Reservations): Reservations {
         return repository.save(reservation)
     }
 

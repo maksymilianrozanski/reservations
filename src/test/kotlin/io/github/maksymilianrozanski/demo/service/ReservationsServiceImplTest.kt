@@ -116,18 +116,16 @@ internal class ReservationsServiceImplTest {
     }
 
     @Test
-    fun assignUserToReservation() {
-        val someReservation = Reservations(title = "Title", description = "Description",
-                start = Timestamp(1561037749627L), end = Timestamp(1561037763719L))
+    fun editReservationSuccess() {
         val userToSaveMock = Mockito.mock(User::class.java)
-        val expectedReservation = Reservations(title = "Title", description = "Description",
+        val reservation = Reservations(title = "Title", description = "Description",
                 start = Timestamp(1561037749627L), end = Timestamp(1561037763719L), user = userToSaveMock)
         Mockito.`when`(repositoryMock.save<Reservations>(argThat {
-            user == userToSaveMock
-        })).thenReturn(expectedReservation)
-        service.changeUserOfReservation(userToSaveMock, someReservation)
+            equals(reservation)
+        })).thenReturn(reservation)
+        service.editReservation(reservation)
         Mockito.verify(repositoryMock).save(argThat<Reservations> {
-            this.user == userToSaveMock && this == someReservation
+            this == reservation
         })
     }
 
