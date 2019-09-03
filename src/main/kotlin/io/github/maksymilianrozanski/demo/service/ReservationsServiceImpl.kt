@@ -43,13 +43,12 @@ class ReservationsServiceImpl : ReservationsService {
         repository.delete(reservation)
     }
 
-    override fun changeUserOfReservation(newUser: User, reservation: Reservations) {
+    override fun changeUserOfReservation(newUser: User, reservation: Reservations): Reservations {
         reservation.user = newUser
-        repository.save(reservation)
+        return repository.save(reservation)
     }
 
-    //TODO: remove user's password from response
-    override fun addUserToNotReservedReservation(user:User, reservationId: Int): Reservations {
+    override fun addUserToNotReservedReservation(user: User, reservationId: Int): Reservations {
         val optionalReservation = repository.findById(reservationId)
         if (optionalReservation.isPresent) {
             val reservation = optionalReservation.get()

@@ -1,5 +1,6 @@
 package io.github.maksymilianrozanski.demo.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 @Entity
@@ -10,6 +11,7 @@ data class Role(
     @GeneratedValue
     val id: Long = 0
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "user_roles",
             inverseJoinColumns = [JoinColumn(name = "user_id")],

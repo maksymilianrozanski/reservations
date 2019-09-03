@@ -18,7 +18,7 @@ interface ReservationsService {
 
     fun deleteReservation(reservation: Reservations)
 
-    fun changeUserOfReservation(newUser: User, reservation: Reservations)
+    fun changeUserOfReservation(newUser: User, reservation: Reservations): Reservations
 
     fun addUserToNotReservedReservation(user: User, reservationId: Int): Reservations
 }
