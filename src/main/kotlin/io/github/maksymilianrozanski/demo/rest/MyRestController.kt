@@ -25,7 +25,12 @@ class MyRestController(@Autowired var service: ReservationsService) {
 
     @GetMapping("/reservations")
     fun findAll(): List<Reservations> {
-        return service.findAll()
+        val userRole = userDetailsService.currentUserRoles()
+        return if (userRole.contains("Role(roleName=ADMIN)")) {
+            service.findAll()
+        } else {
+            service.findUnoccupiedReservations()
+        }
     }
 
     @PostMapping("/reservations")

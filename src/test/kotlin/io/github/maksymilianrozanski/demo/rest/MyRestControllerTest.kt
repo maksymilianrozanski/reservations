@@ -72,12 +72,16 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
-    fun findAllTest() {
+    fun findAllByAdminTest() {
         val mockedReservation = Reservations(reservationId = 20, title = "This is title returned by mock service",
                 description = "description", start = Timestamp(1561117396873),
                 end = Timestamp(1561117410153), user = null)
+        val mockedReservation2 = Reservations(reservationId = 21, title = "This is second item's title",
+                description = "description", start = Timestamp(1567609028201),
+                end = Timestamp(1567610531696), user = User("firstName", "lastName", "username", "email@example.com"))
         Mockito.`when`(reservationsServiceMock.findAll())
-                .thenReturn(listOf(mockedReservation))
+                .thenReturn(listOf(mockedReservation, mockedReservation2))
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)", "Role(roleName=ADMIN)"))
         val uri = "/api/reservations"
         val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
                 .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
@@ -85,13 +89,44 @@ class MyRestControllerTest : AbstractTest() {
         Assert.assertEquals(200, status)
         val content = mvcResult.response.contentAsString
         val obtainedList = super.mapFromJson(content, Array<Reservations>::class.java)
-        Assert.assertEquals(mockedReservation, obtainedList[0])
-        Assert.assertEquals(1, obtainedList.size)
+        Assert.assertEquals(listOf(mockedReservation, mockedReservation2), obtainedList.toList())
     }
 
     @Test
-    fun findAllTestEmptyList() {
+    fun findAllByUserTest() {
+        val mockedReservation = Reservations(reservationId = 20, title = "This is title returned by mock service",
+                description = "description", start = Timestamp(1561117396873),
+                end = Timestamp(1561117410153), user = null)
+        Mockito.`when`(reservationsServiceMock.findUnoccupiedReservations()).thenReturn(listOf(mockedReservation))
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
+        val uri = "/api/reservations"
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(200, status)
+        val content = mvcResult.response.contentAsString
+        val obtainedList = super.mapFromJson(content, Array<Reservations>::class.java)
+        Assert.assertEquals(listOf(mockedReservation), obtainedList.toList())
+    }
+
+    @Test
+    fun findAllEmptyListByAdminTest() {
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)", "Role(roleName=ADMIN)"))
         Mockito.`when`(reservationsServiceMock.findAll()).thenReturn(listOf())
+        val uri = "/api/reservations"
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(200, status)
+        val content = mvcResult.response.contentAsString
+        val obtainedList = super.mapFromJson(content, Array<Reservations>::class.java)
+        Assert.assertEquals(0, obtainedList.size)
+    }
+
+    @Test
+    fun findAllEmptyListByUserTest() {
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
+        Mockito.`when`(reservationsServiceMock.findUnoccupiedReservations()).thenReturn(listOf())
         val uri = "/api/reservations"
         val mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
                 .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
