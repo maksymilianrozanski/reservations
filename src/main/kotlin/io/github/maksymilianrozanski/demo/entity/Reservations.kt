@@ -1,5 +1,6 @@
 package io.github.maksymilianrozanski.demo.entity
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import java.sql.Timestamp
 import javax.persistence.*
 
@@ -12,6 +13,8 @@ data class Reservations(
         @ManyToOne
         @JoinColumn(name = "userId")
         var user: User? = null,
-        val start: Timestamp = Timestamp(0),
-        val end: Timestamp = Timestamp(0)
+        @get:JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        var start: Timestamp = Timestamp(0),
+        @get:JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        var end: Timestamp = Timestamp(0)
 )

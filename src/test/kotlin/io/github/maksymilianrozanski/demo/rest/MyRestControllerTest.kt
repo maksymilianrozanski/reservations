@@ -74,11 +74,11 @@ class MyRestControllerTest : AbstractTest() {
     @Test
     fun findAllByAdminTest() {
         val mockedReservation = Reservations(reservationId = 20, title = "This is title returned by mock service",
-                description = "description", start = Timestamp(1561117396873),
-                end = Timestamp(1561117410153), user = null)
+                description = "description", start = Timestamp(1561117300000),
+                end = Timestamp(1561117400000), user = null)
         val mockedReservation2 = Reservations(reservationId = 21, title = "This is second item's title",
-                description = "description", start = Timestamp(1567609028201),
-                end = Timestamp(1567610531696), user = User("firstName", "lastName", "username", "email@example.com"))
+                description = "description", start = Timestamp(1567609000000),
+                end = Timestamp(1567610500000), user = User("firstName", "lastName", "username", "email@example.com"))
         Mockito.`when`(reservationsServiceMock.findAll())
                 .thenReturn(listOf(mockedReservation, mockedReservation2))
         Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)", "Role(roleName=ADMIN)"))
@@ -95,8 +95,8 @@ class MyRestControllerTest : AbstractTest() {
     @Test
     fun findAllByUserTest() {
         val mockedReservation = Reservations(reservationId = 20, title = "This is title returned by mock service",
-                description = "description", start = Timestamp(1561117396873),
-                end = Timestamp(1561117410153), user = null)
+                description = "description", start = Timestamp(1561117300000),
+                end = Timestamp(1561117400000), user = null)
         Mockito.`when`(reservationsServiceMock.findUnoccupiedReservations()).thenReturn(listOf(mockedReservation))
         Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
         val uri = "/api/reservations"
@@ -141,7 +141,7 @@ class MyRestControllerTest : AbstractTest() {
     fun addNewReservationTest() {
         val uri = "/api/reservations"
         val input = Reservations(title = "title", description = "description",
-                start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+                start = Timestamp(1561122000000), end = Timestamp(1561122000000))
         val output = Reservations(reservationId = 15, title = input.title,
                 description = input.description, start = input.start, end = input.end)
         Mockito.`when`(reservationsServiceMock.addReservation(input.title, input.description, input.start, input.end))
@@ -179,13 +179,13 @@ class MyRestControllerTest : AbstractTest() {
         Mockito.`when`(userMock.username).thenReturn("SomeUserName")
         Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
         val reservation = Reservations(reservationId = 15, user = null, title = "title", description = "description",
-                start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+                start = Timestamp(1561122000000), end = Timestamp(1561122000000))
         Mockito.`when`(reservationsServiceMock.findById(15)).thenReturn(reservation)
         val uri = "/api/reservations"
         val serviceResponse = Reservations(reservationId = 15, user = User(firstName = "First name", lastName = "Last name",
                 email = "example@example.com", username = "SomeUserName"),
                 title = "title", description = "description",
-                start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+                start = Timestamp(1561122000000), end = Timestamp(1561122000000))
         val inputJson = super.mapToJson(reservation)
         Mockito.`when`(reservationsServiceMock.addUserToNotReservedReservation(userMock, 15))
                 .thenReturn(serviceResponse)
