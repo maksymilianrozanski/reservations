@@ -20,7 +20,7 @@ data class User(var firstName: String = "",
     @JoinTable(name = "user_roles",
             inverseJoinColumns = [JoinColumn(name = "roles_id")],
             joinColumns = [JoinColumn(name = "user_id")])
-    var roles: List<Role> = listOf()
+    var roles: Set<Role> = HashSet()
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")

@@ -16,5 +16,5 @@ data class Role(
     @JoinTable(name = "user_roles",
             inverseJoinColumns = [JoinColumn(name = "user_id")],
             joinColumns = [JoinColumn(name = "roles_id")])
-    val users: List<User> = listOf()
+    val users: Set<User> = HashSet()
 }

@@ -32,7 +32,7 @@ INSERT INTO user(user_id, email, first_name, last_name, password, username)
 VALUES (3, 'example3@example.com', 'Marry', 'Surname',
         '$2a$10$8bSvjjfn9smNuViinaGy0erNIwyJysYTvjC2XkBcikTXSU5hzPN6u', 'user2');
 INSERT INTO user_roles (user_id, roles_id)
-values (2, 2);
+values (3, 2);
 
 INSERT INTO reservations(reservation_id, description, start, end, title, user_id)
 VALUES (10, 'example description 1', '2019-09-02 14:58:48', '2019-09-02 16:58:48', 'test reservation', 2);
