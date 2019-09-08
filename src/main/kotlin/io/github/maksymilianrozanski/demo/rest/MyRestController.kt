@@ -44,7 +44,7 @@ class MyRestController(@Autowired var service: ReservationsService) {
     fun deleteReservation(@PathVariable(value = "id") id: Int): ResponseEntity<Void> {
         return try {
             service.deleteReservation(id)
-            ResponseEntity(HttpStatus.OK)   //TODO: return with status 204 / no content
+            ResponseEntity(HttpStatus.NO_CONTENT)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }

@@ -160,7 +160,7 @@ class MyRestControllerTest : AbstractTest() {
         val uri = "/api/reservations/10"
         val mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri).accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
         val status = mvcResult.response.status
-        Assert.assertEquals(200, status)
+        Assert.assertEquals(204, status)
     }
 
     @Test
