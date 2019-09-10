@@ -3,6 +3,8 @@ package io.github.maksymilianrozanski.demo.security
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -10,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
+import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.access.channel.ChannelProcessingFilter
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
@@ -40,10 +43,13 @@ class SecurityConfig() : WebSecurityConfigurerAdapter() {
 
     var myFailureHandler = SimpleUrlAuthenticationFailureHandler()
 
+    var customAccessDeniedHandler = CustomAccessDeniedHandler()
+
     override fun configure(http: HttpSecurity?) {
         http!!.addFilterBefore(CustomFilter(), ChannelProcessingFilter::class.java)
         http.csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler)
                 .and()
                 .authorizeRequests().anyRequest().authenticated()
 //                .antMatchers("/api/**")
@@ -98,5 +104,13 @@ class MySavedRequestAwareAuthenticationSuccessHandler : SimpleUrlAuthenticationS
         }
 
         clearAuthenticationAttributes(request)
+    }
+}
+
+@Component
+class CustomAccessDeniedHandler : AccessDeniedHandler {
+
+    override fun handle(request: HttpServletRequest?, response: HttpServletResponse?, accessDeniedException: AccessDeniedException?) {
+        response?.status = HttpStatus.FORBIDDEN.value()
     }
 }
