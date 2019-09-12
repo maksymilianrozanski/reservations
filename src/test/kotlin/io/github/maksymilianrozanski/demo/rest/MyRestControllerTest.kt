@@ -1,5 +1,6 @@
 package io.github.maksymilianrozanski.demo.rest
 
+import com.nhaarman.mockitokotlin2.any
 import io.github.maksymilianrozanski.demo.entity.Reservations
 import io.github.maksymilianrozanski.demo.entity.Role
 import io.github.maksymilianrozanski.demo.entity.User
@@ -241,6 +242,7 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser
     fun bookingReservationSuccess() {
         val userMock = Mockito.mock(User::class.java)
         Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
@@ -266,6 +268,7 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser
     fun bookingReservationNotFoundException() {
         val userMock = Mockito.mock(User::class.java)
         Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
@@ -285,9 +288,9 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser
     fun bookingReservationAlreadyBooked() {
         val userMock = Mockito.mock(User::class.java)
-        Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
         Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
         Mockito.`when`(userMock.username).thenReturn("SomeUserName")
         Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
@@ -305,9 +308,9 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser
     fun bookingReservationByTheSameUserAgain() {
         val userMock = Mockito.mock(User::class.java)
-        Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
         Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
         Mockito.`when`(userMock.username).thenReturn("SomeUserName")
         Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
@@ -323,5 +326,25 @@ class MyRestControllerTest : AbstractTest() {
                 .content(inputJson)).andReturn()
         val status = mvcResult.response.status
         Assert.assertEquals(HttpStatus.NO_CONTENT.value(), status)
+    }
+
+    @Test
+    @WithMockCustomUser(roles = ["ADMIN"])
+    fun editingReservationByAdmin() {
+        val userMock = Mockito.mock(User::class.java)
+        Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
+        Mockito.`when`(userMock.username).thenReturn("SomeAdminName")
+        Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)", "Role(roleName=ADMIN)"))
+        val reservationResultMock = Mockito.mock(Reservations::class.java)
+        Mockito.`when`(reservationsServiceMock.editReservation(any())).thenReturn(reservationResultMock)
+        val uri = "/api/reservations"
+        val reservation = Reservations(reservationId = 15, user = User(firstName = "First name", lastName = "Last name",
+                email = "example@example.com", username = "SomeUserName"), title = "title", description = "description",
+                start = Timestamp(1561122072971), end = Timestamp(1561122085630))
+        val inputJson = super.mapToJson(reservation)
+        val mvcResult = mvc.perform(MockMvcRequestBuilders.put(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn()
+        val status = mvcResult.response.status
+        Assert.assertEquals(HttpStatus.OK.value(), status)
     }
 }

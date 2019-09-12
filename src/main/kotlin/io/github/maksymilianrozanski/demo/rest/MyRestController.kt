@@ -56,6 +56,7 @@ class MyRestController(@Autowired var service: ReservationsService) {
         }
     }
 
+    @PreAuthorize("@myUserDetailsService.currentUserRoles().contains('Role(roleName=ADMIN)') || @myUserDetailsService.currentUserRoles().contains('Role(roleName=USER)')")
     @PutMapping("/reservations")
     fun editReservation(@RequestBody reservation: Reservations): ResponseEntity<Reservations> {
         when {
