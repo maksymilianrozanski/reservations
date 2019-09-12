@@ -308,15 +308,12 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(username = "SomeUserName")
     fun bookingReservationByTheSameUserAgain() {
-        val userMock = Mockito.mock(User::class.java)
-        Mockito.`when`(userDetailsServiceMock.currentUser()).thenReturn(userMock)
-        Mockito.`when`(userMock.username).thenReturn("SomeUserName")
         Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
         val reservationMock = Mockito.mock(Reservations::class.java)
         Mockito.`when`(reservationsServiceMock.findById(15)).thenReturn(reservationMock)
-        Mockito.`when`(reservationMock.user).thenReturn(userMock)
+        Mockito.`when`(reservationMock.user).thenReturn((SecurityContextHolder.getContext().authentication.principal as CustomUserDetails).user)
         val uri = "/api/reservations"
         val reservation = Reservations(reservationId = 15, user = User(firstName = "First name", lastName = "Last name",
                 email = "example@example.com", username = "SomeUserName"), title = "title", description = "description",

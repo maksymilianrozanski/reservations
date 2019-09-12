@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
 @CrossOrigin(origins = ["http://localhost:4200"])
@@ -64,7 +65,7 @@ class MyRestController(@Autowired var service: ReservationsService) {
             -> return ResponseEntity.ok(service.editReservation(reservation))
             userDetailsService.currentUserRoles().contains("Role(roleName=USER)")
             -> {
-                if (userDetailsService.currentUser().username
+                if (SecurityContextHolder.getContext().authentication.name
                         == service.findById(reservation.reservationId)?.user?.username ?: false) {
                     //Already booked by this user
                     return ResponseEntity(HttpStatus.NO_CONTENT)
