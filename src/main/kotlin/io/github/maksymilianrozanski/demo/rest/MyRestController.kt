@@ -45,6 +45,7 @@ class MyRestController(@Autowired var service: ReservationsService) {
                 start = reservation.start, end = reservation.end)
     }
 
+    @PreAuthorize("@myUserDetailsService.currentUserRoles().contains('Role(roleName=ADMIN)')")
     @DeleteMapping("/reservations/{id}")
     fun deleteReservation(@PathVariable(value = "id") id: Int): ResponseEntity<Void> {
         return try {

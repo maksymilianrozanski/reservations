@@ -210,6 +210,7 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser(roles = ["ADMIN"])
     fun deleteReservationSuccess() {
         val uri = "/api/reservations/10"
         val mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri).accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
@@ -218,12 +219,25 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser(roles = ["ADMIN"])
     fun deleteReservationNotFound() {
         val uri = "/api/reservations/10"
         Mockito.`when`(reservationsServiceMock.deleteReservation(10)).thenAnswer { throw NotFoundException("Not found record with id: 10") }
         val mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri).accept(MediaType.APPLICATION_JSON_VALUE)).andReturn()
         val status = mvcResult.response.status
         Assert.assertEquals(HttpStatus.NOT_FOUND.value(), status)
+    }
+
+    @Test
+    @WithMockCustomUser
+    fun deleteReservationByUser() {
+        val uri = "/api/reservations/10"
+        Mockito.`when`(reservationsServiceMock.deleteReservation(10)).thenAnswer { throw NotFoundException("Not found record with id: 10") }
+        val throwable = assertFailsWith<NestedServletException> {
+            mvc.perform(MockMvcRequestBuilders.delete(uri).accept(MediaType.APPLICATION_JSON_VALUE))
+        }
+        Assertions.assertThat(throwable)
+                .hasCauseInstanceOf(org.springframework.security.access.AccessDeniedException::class.java)
     }
 
     @Test
