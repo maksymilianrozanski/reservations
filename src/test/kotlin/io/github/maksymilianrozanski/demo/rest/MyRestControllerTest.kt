@@ -1,7 +1,9 @@
 package io.github.maksymilianrozanski.demo.rest
 
 import io.github.maksymilianrozanski.demo.entity.Reservations
+import io.github.maksymilianrozanski.demo.entity.Role
 import io.github.maksymilianrozanski.demo.entity.User
+import io.github.maksymilianrozanski.demo.security.CustomUserDetails
 import io.github.maksymilianrozanski.demo.security.CustomUserDetailsService
 import io.github.maksymilianrozanski.demo.service.AlreadyBookedException
 import io.github.maksymilianrozanski.demo.service.NotFoundException
@@ -19,9 +21,15 @@ import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.test.context.support.WithSecurityContext
+import org.springframework.security.test.context.support.WithSecurityContextFactory
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import java.sql.Timestamp
+import java.util.stream.Collectors
 
 @Profile("test")
 @Configuration
@@ -37,6 +45,28 @@ class TestTableServiceTestConfiguration {
     @Primary
     fun userDetailsService(): CustomUserDetailsService {
         return Mockito.mock(CustomUserDetailsService::class.java)
+    }
+}
+
+@WithSecurityContext(factory = WithMockCustomUserSecurityContextFactory::class)
+annotation class WithMockCustomUser(val firstName: String = "firstName",
+                                    val lastName: String = "lastName",
+                                    val username: String = "username",
+                                    val email: String = "example@example.com",
+                                    val password: String = "pass",
+                                    val roles: Array<String> = ["USER"])
+
+
+class WithMockCustomUserSecurityContextFactory : WithSecurityContextFactory<WithMockCustomUser> {
+
+    override fun createSecurityContext(customUser: WithMockCustomUser): SecurityContext {
+        val context = SecurityContextHolder.createEmptyContext()
+        val user = User(customUser.firstName, customUser.lastName, customUser.username, customUser.email, customUser.password)
+        user.roles = customUser.roles.toList().stream().map { role -> Role(roleName = role) }.collect(Collectors.toSet())
+        val principal = CustomUserDetails(user)
+        val auth = UsernamePasswordAuthenticationToken(principal, customUser.password, principal.authorities)
+        context.authentication = auth
+        return context
     }
 }
 
@@ -72,6 +102,7 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser(roles = ["ADMIN", "USER"])
     fun findAllByAdminTest() {
         val mockedReservation = Reservations(reservationId = 20, title = "This is title returned by mock service",
                 description = "description", start = Timestamp(1561117300000),
@@ -93,6 +124,7 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser
     fun findAllByUserTest() {
         val mockedReservation = Reservations(reservationId = 20, title = "This is title returned by mock service",
                 description = "description", start = Timestamp(1561117300000),
@@ -110,6 +142,7 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser(roles = ["ADMIN"])
     fun findAllEmptyListByAdminTest() {
         Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)", "Role(roleName=ADMIN)"))
         Mockito.`when`(reservationsServiceMock.findAll()).thenReturn(listOf())
@@ -124,6 +157,7 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
+    @WithMockCustomUser
     fun findAllEmptyListByUserTest() {
         Mockito.`when`(userDetailsServiceMock.currentUserRoles()).thenReturn(listOf("Role(roleName=USER)"))
         Mockito.`when`(reservationsServiceMock.findUnoccupiedReservations()).thenReturn(listOf())

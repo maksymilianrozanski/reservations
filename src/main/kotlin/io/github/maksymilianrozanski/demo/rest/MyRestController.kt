@@ -8,11 +8,14 @@ import io.github.maksymilianrozanski.demo.service.ReservationsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.web.bind.annotation.*
 
 @CrossOrigin(origins = ["http://localhost:4200"])
 @RestController
 @RequestMapping("/api")
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 class MyRestController(@Autowired var service: ReservationsService) {
 
     @Autowired
@@ -23,6 +26,7 @@ class MyRestController(@Autowired var service: ReservationsService) {
         return userDetailsService.currentUserRoles()
     }
 
+    @PreAuthorize("@myUserDetailsService.currentUserRoles().contains('Role(roleName=ADMIN)') || @myUserDetailsService.currentUserRoles().contains('Role(roleName=USER)')")
     @GetMapping("/reservations")
     fun findAll(): List<Reservations> {
         val userRole = userDetailsService.currentUserRoles()
