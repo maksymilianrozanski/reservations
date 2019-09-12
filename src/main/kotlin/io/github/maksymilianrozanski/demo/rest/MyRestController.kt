@@ -37,6 +37,7 @@ class MyRestController(@Autowired var service: ReservationsService) {
         }
     }
 
+    @PreAuthorize("@myUserDetailsService.currentUserRoles().contains('Role(roleName=ADMIN)')")
     @PostMapping("/reservations")
     @ResponseStatus(HttpStatus.CREATED)
     fun addNewReservation(@RequestBody reservation: Reservations): Reservations {

@@ -8,6 +8,7 @@ import io.github.maksymilianrozanski.demo.security.CustomUserDetailsService
 import io.github.maksymilianrozanski.demo.service.AlreadyBookedException
 import io.github.maksymilianrozanski.demo.service.NotFoundException
 import io.github.maksymilianrozanski.demo.service.ReservationsService
+import org.assertj.core.api.Assertions
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -28,8 +29,10 @@ import org.springframework.security.test.context.support.WithSecurityContext
 import org.springframework.security.test.context.support.WithSecurityContextFactory
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.web.util.NestedServletException
 import java.sql.Timestamp
 import java.util.stream.Collectors
+import kotlin.test.assertFailsWith
 
 @Profile("test")
 @Configuration
@@ -172,7 +175,8 @@ class MyRestControllerTest : AbstractTest() {
     }
 
     @Test
-    fun addNewReservationTest() {
+    @WithMockCustomUser(roles = ["ADMIN"])
+    fun addNewReservationByAdminTest() {
         val uri = "/api/reservations"
         val input = Reservations(title = "title", description = "description",
                 start = Timestamp(1561122000000), end = Timestamp(1561122000000))
@@ -187,6 +191,22 @@ class MyRestControllerTest : AbstractTest() {
         Assert.assertEquals(201, status)
         val content = super.mapFromJson(mvcResult.response.contentAsString, Reservations::class.java)
         Assert.assertEquals(output, content)
+    }
+
+    @Test
+    @WithMockCustomUser(roles = ["USER"])
+    fun addNewReservationByUserTest() {
+        val uri = "/api/reservations"
+        val input = Reservations(title = "title", description = "description",
+                start = Timestamp(1561122000000), end = Timestamp(1561122000000))
+        val inputJson = super.mapToJson(input)
+        val throwable = assertFailsWith<NestedServletException> {
+            mvc.perform(MockMvcRequestBuilders.post(uri)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson))
+
+        }
+        Assertions.assertThat(throwable)
+                .hasCauseInstanceOf(org.springframework.security.access.AccessDeniedException::class.java)
     }
 
     @Test
