@@ -16,6 +16,7 @@ import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.access.channel.ChannelProcessingFilter
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils
@@ -52,11 +53,10 @@ class SecurityConfig() : WebSecurityConfigurerAdapter() {
                 .accessDeniedHandler(customAccessDeniedHandler)
                 .and()
                 .authorizeRequests().anyRequest().authenticated()
-//                .antMatchers("/api/**")
-//                .hasRole("ADMIN")
                 .and()
                 .formLogin()
-                .successHandler(mySuccessHandler).failureHandler(myFailureHandler).and().cors().and().logout()
+                .successHandler(mySuccessHandler).failureHandler(myFailureHandler).and().cors()
+                .and().logout().logoutSuccessHandler(HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
     }
 
     override fun configure(auth: AuthenticationManagerBuilder?) {
