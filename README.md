@@ -2,7 +2,7 @@
 API allowing adding reservations by the admin and booking them by users. Project is using Kotlin, Spring Boot.
 Require setting empty database with name and credentials matching application.properties file
 
-example http requests (triple quotes in json required by Windows):
+example http requests (tripple quotes in json required by Windows):
 
 Logging in - admin (getting cookie)<br>
 curl -i -X POST -d username=admin -d password=pass -c cookies.txt http://localhost:8080/login
